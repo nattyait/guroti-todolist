@@ -19,7 +19,9 @@ export class StorageService {
 
     updateTask(oldTask, newTask) {
         const tasks = this.getTasks();
-        const taskIndex = tasks.indexOf(oldTask);
+        const taskIndex = tasks.findIndex(t => 
+            (typeof t === 'string' ? t : t.text) === oldTask
+        );
         if (taskIndex !== -1) {
             tasks[taskIndex] = newTask;
             this.saveTasks(tasks);
@@ -28,7 +30,9 @@ export class StorageService {
 
     removeTask(taskText) {
         const tasks = this.getTasks();
-        const updatedTasks = tasks.filter(task => task !== taskText);
+        const updatedTasks = tasks.filter(task => 
+            (typeof task === 'string' ? task : task.text) !== taskText
+        );
         this.saveTasks(updatedTasks);
     }
 } 

@@ -22,9 +22,13 @@ export class TaskManager {
     }
 
     addTask() {
-        const task = this.taskInput.value.trim();
-        if (task) {
-            this.createTask(task);
+        const taskText = this.taskInput.value.trim();
+        if (taskText) {
+            const task = {
+                text: taskText,
+                completed: false
+            };
+            this.createTask(task.text);
             this.storageService.addTask(task);
             this.taskInput.value = '';
         }
@@ -39,9 +43,37 @@ export class TaskManager {
 
     createTaskElement(task) {
         const li = document.createElement('li');
+        li.draggable = true;  // Make it draggable
+
+        // Create check button
+        const checkButton = document.createElement('button');
+        checkButton.className = 'check';
+        checkButton.innerHTML = '✓';
+        
+        // If task is an object with completed property, initialize the state
+        if (typeof task === 'object' && task.completed) {
+            checkButton.classList.add('checked');
+            taskSpan.classList.add('completed');
+            task = task.text;  // Use the text for the span
+        }
+        
+        // Add check button click handler
+        checkButton.addEventListener('click', () => {
+            checkButton.classList.toggle('checked');
+            taskSpan.classList.toggle('completed');
+            // Store the completed state
+            this.storageService.updateTask(task, {
+                text: task,
+                completed: checkButton.classList.contains('checked')
+            });
+        });
+        li.appendChild(checkButton);
+
+        // Create task text span
         const taskSpan = document.createElement('span');
-        taskSpan.textContent = task;
+        taskSpan.textContent = typeof task === 'object' ? task.text : task;
         li.appendChild(taskSpan);
+        
         return li;
     }
 
