@@ -11,8 +11,10 @@
 <body>
     <div class="container">
         <h1>To-Do List</h1>
-        <input id="taskInput" type="text" placeholder="Add a new task">
-        <button onclick="addTask()">Add</button>
+        <div class="input-group">
+            <input id="taskInput" type="text" placeholder="Add a new task">
+            <button onclick="taskManager.addTask()">Add</button>
+        </div>
         <ul id="taskList"></ul>
     </div>
     <script src="script.js"></script>

@@ -1,154 +1,119 @@
-const taskList = document.getElementById('taskList');
-const taskInput = document.getElementById('taskInput');
-
-function addTask() {
-    const task = taskInput.value.trim();
-    if (task) {
-        createTask(task);
-        saveTaskToLocalStorage(task);
-        taskInput.value = '';
+class TaskManager {
+    constructor(taskListId = 'taskList', taskInputId = 'taskInput') {
+        this.taskList = document.getElementById(taskListId);
+        this.taskInput = document.getElementById(taskInputId);
+        this.loadTasks();
     }
-}
-function createTask(task) {
-    const li = document.createElement('li');
-    li.draggable = true;
 
-    // Add drag handlers
-    li.addEventListener('dragstart', handleDragStart);
-    li.addEventListener('dragover', handleDragOver);
-    li.addEventListener('drop', handleDrop);
-    li.addEventListener('dragenter', handleDragEnter);
-    li.addEventListener('dragleave', handleDragLeave);
+    addTask() {
+        const taskText = this.taskInput.value.trim();
+        if (taskText) {
+            const task = {
+                text: taskText,
+                completed: false
+            };
+            this.createTask(task);
+            this.saveTask(task);
+            this.taskInput.value = '';
+        }
+    }
 
-    // Create span for task text
-    const taskSpan = document.createElement('span');
-    taskSpan.textContent = task;
-    li.appendChild(taskSpan);
-
-    // Add edit button
-    const editButton = document.createElement('button');
-    editButton.textContent = 'Edit';
-    editButton.onclick = () => editTask(taskSpan);
-    li.appendChild(editButton);
-
-    removeTask(li);
-
-    taskList.appendChild(li); 
-    
-}
-// Add these new drag and drop functions
-let draggedItem = null;
-
-function handleDragStart(e) {
-    draggedItem = this;
-    this.classList.add('dragging');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();  // Necessary to allow dropping
-}
-
-function handleDragEnter(e) {
-    e.preventDefault();
-    this.classList.add('drag-over');
-}
-
-function handleDragLeave(e) {
-    this.classList.remove('drag-over');
-}
-function handleDrop(e) {
-    e.preventDefault();
-    if (this !== draggedItem) {
-        let allItems = [...taskList.querySelectorAll('li')];
-        let draggedIndex = allItems.indexOf(draggedItem);
-        let droppedIndex = allItems.indexOf(this);
-
-        if (draggedIndex < droppedIndex) {
-            this.parentNode.insertBefore(draggedItem, this.nextSibling);
-        } else {
-            this.parentNode.insertBefore(draggedItem, this);
+    createTask(task) {
+        const li = document.createElement('li');
+        
+        // Create checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = task.completed;
+        checkbox.addEventListener('change', () => {
+            taskSpan.classList.toggle('completed');
+            this.updateTaskStatus(task.text, checkbox.checked);
+        });
+        
+        // Create task text span
+        const taskSpan = document.createElement('span');
+        taskSpan.textContent = task.text;
+        if (task.completed) {
+            taskSpan.classList.add('completed');
         }
         
-        // Update localStorage with new order
-        updateTasksOrder();
+        // Create edit button
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.onclick = () => this.editTask(taskSpan);
+        
+        // Create remove button
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => {
+            const tasks = this.getTasks().filter(t => t.text !== task.text);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            li.remove();
+        };
+        
+        // Append all elements
+        li.appendChild(checkbox);
+        li.appendChild(taskSpan);
+        li.appendChild(editButton);
+        li.appendChild(removeButton);
+        
+        this.taskList.appendChild(li);
     }
-    this.classList.remove('drag-over');
-    draggedItem.classList.remove('dragging');
-}
-function updateTasksOrder() {
-    const tasks = [];
-    taskList.querySelectorAll('li span').forEach(span => {
-        tasks.push(span.textContent);
-    });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-}
 
-function editTask(taskSpan) {
-    const oldText = taskSpan.textContent;
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = oldText;
-    
-    // Replace span with input temporarily
-    taskSpan.parentNode.replaceChild(input, taskSpan);
-    input.focus();
-    
-    input.onblur = () => {
-        const newText = input.value.trim();
-        if (newText) {
-            // Update localStorage
-            updateTaskInLocalStorage(oldText, newText);
-            taskSpan.textContent = newText;
-        }
-        // Replace input with span
-        input.parentNode.replaceChild(taskSpan, input);
-    };
-    
-    input.onkeypress = (e) => {
-        if (e.key === 'Enter') {
-            input.blur();
-        }
-    };
-}
-function removeTask(li) {
-    // สร้างปุ่ม Remove
-    const removeButton = document.createElement('button');
-    removeButton.textContent = 'Remove';
-    removeButton.onclick = () => {
-        li.remove();
-        removeTaskFromLocalStorage(li.textContent);
-    };
-    li.appendChild(removeButton);
-}
-
-// ฟังก์ชันบันทึก Task ลงใน Local Storage
-function saveTaskToLocalStorage(task) {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.push(task);
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-}
-// Add new localStorage update function
-function updateTaskInLocalStorage(oldTask, newTask) {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const taskIndex = tasks.indexOf(oldTask);
-    if (taskIndex !== -1) {
-        tasks[taskIndex] = newTask;
+    saveTask(task) {
+        const tasks = this.getTasks();
+        tasks.push(task);
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
+
+    getTasks() {
+        return JSON.parse(localStorage.getItem('tasks')) || [];
+    }
+
+    updateTaskStatus(taskText, completed) {
+        const tasks = this.getTasks();
+        const task = tasks.find(t => t.text === taskText);
+        if (task) {
+            task.completed = completed;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+    }
+
+    editTask(taskSpan) {
+        const oldText = taskSpan.textContent;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = oldText;
+        
+        taskSpan.parentNode.replaceChild(input, taskSpan);
+        input.focus();
+        
+        input.onblur = () => {
+            const newText = input.value.trim();
+            if (newText && newText !== oldText) {
+                const tasks = this.getTasks();
+                const task = tasks.find(t => t.text === oldText);
+                if (task) {
+                    task.text = newText;
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    taskSpan.textContent = newText;
+                }
+            }
+            input.parentNode.replaceChild(taskSpan, input);
+        };
+        
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') input.blur();
+        };
+    }
+
+    loadTasks() {
+        const tasks = this.getTasks();
+        tasks.forEach(task => this.createTask(task));
+    }
 }
 
-// ฟังก์ชันลบ Task จาก Local Storage
-function removeTaskFromLocalStorage(taskToRemove) {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const updatedTasks = tasks.filter(task => task !== taskToRemove);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-}
-
-// ฟังก์ชันโหลด Task จาก Local Storage
-function loadTasksFromLocalStorage() {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    tasks.forEach(task => createTask(task));
-}
-
-// โหลด Task เมื่อหน้าเว็บเปิด
-document.addEventListener('DOMContentLoaded', loadTasksFromLocalStorage);
+// Initialize TaskManager when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.taskManager = new TaskManager();
+});
