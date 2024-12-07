@@ -1,0 +1,26 @@
+{
+  "name": "todo-pwa",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFiles": ["./jest.setup.js"]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.x.x",
+    "@babel/preset-env": "^7.x.x",
+    "babel-jest": "^29.x.x",
+    "jest": "^29.x.x",
+    "jest-environment-jsdom": "^29.x.x"
+  },
+  "dependencies": {
+    "jest-environment-jsdom": "^29.x.x"
+  }
+}
