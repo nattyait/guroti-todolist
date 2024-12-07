@@ -20,6 +20,7 @@ class TaskManager {
 
     createTask(task) {
         const li = document.createElement('li');
+        li.draggable = true;
         
         // Create checkbox
         const checkbox = document.createElement('input');
@@ -51,6 +52,16 @@ class TaskManager {
             li.remove();
         };
         
+        // Add drag and drop event listeners
+        li.addEventListener('dragstart', () => {
+            li.classList.add('dragging');
+        });
+
+        li.addEventListener('dragend', () => {
+            li.classList.remove('dragging');
+            this.updateTasksOrder();
+        });
+        
         // Append all elements
         li.appendChild(checkbox);
         li.appendChild(taskSpan);
@@ -58,6 +69,65 @@ class TaskManager {
         li.appendChild(removeButton);
         
         this.taskList.appendChild(li);
+        this.setupDragAndDrop();
+    }
+
+    setupDragAndDrop() {
+        this.taskList.querySelectorAll('li').forEach(item => {
+            if (!item.draggable) {
+                item.draggable = true;
+                item.addEventListener('dragstart', () => {
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                    this.updateTasksOrder();
+                });
+            }
+        });
+
+        this.taskList.addEventListener('dragover', e => {
+            e.preventDefault();
+            const afterElement = this.getDragAfterElement(e.clientY);
+            const draggable = document.querySelector('.dragging');
+            if (draggable) {
+                if (afterElement) {
+                    this.taskList.insertBefore(draggable, afterElement);
+                } else {
+                    this.taskList.appendChild(draggable);
+                }
+            }
+        });
+    }
+
+    getDragAfterElement(y) {
+        const draggableElements = [...this.taskList.querySelectorAll('li:not(.dragging)')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    updateTasksOrder() {
+        const tasks = [];
+        this.taskList.querySelectorAll('li').forEach(li => {
+            const span = li.querySelector('span');
+            const checkbox = li.querySelector('input[type="checkbox"]');
+            if (span) {
+                tasks.push({
+                    text: span.textContent,
+                    completed: checkbox.checked
+                });
+            }
+        });
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
     saveTask(task) {
