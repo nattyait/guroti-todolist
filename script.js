@@ -4,6 +4,7 @@ class TaskManager {
         this.taskInput = document.getElementById(taskInputId);
         this.premiumInput = document.getElementById(premiumAmountId);
         this.titleElement = document.querySelector('h1');
+        this.headerArea = document.querySelector('.header-area');
         this.draggedItem = null;
         this.touchStartY = 0;
         this.touchStartTime = 0;
@@ -15,27 +16,43 @@ class TaskManager {
     setupPullToRefresh() {
         let startY = 0;
         let pullDistance = 0;
-        const threshold = 150; // Distance needed to trigger refresh
+        const threshold = 150;
+        let isPulling = false;
 
-        document.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
-            pullDistance = 0;
+        this.headerArea.addEventListener('touchstart', (e) => {
+            // Only start if touch is in header area
+            const touch = e.touches[0];
+            const headerRect = this.headerArea.getBoundingClientRect();
+            
+            if (touch.clientY <= headerRect.bottom) {
+                startY = touch.clientY;
+                pullDistance = 0;
+                isPulling = true;
+            }
         }, { passive: true });
 
         document.addEventListener('touchmove', (e) => {
-            // Only allow pull-to-refresh when at top of page
-            if (window.scrollY === 0) {
-                const y = e.touches[0].clientY;
-                pullDistance = y - startY;
+            if (!isPulling) return;
+
+            const y = e.touches[0].clientY;
+            pullDistance = y - startY;
+            
+            if (pullDistance > 0 && window.scrollY === 0) {
+                e.preventDefault();
+                document.body.style.transform = `translateY(${Math.min(pullDistance/2, threshold)}px)`;
                 
-                if (pullDistance > 0) {
-                    e.preventDefault();
-                    document.body.style.transform = `translateY(${Math.min(pullDistance/2, threshold)}px)`;
+                // Update pull indicator text
+                if (pullDistance >= threshold) {
+                    this.headerArea.setAttribute('data-pull-state', 'release');
+                } else {
+                    this.headerArea.setAttribute('data-pull-state', 'pull');
                 }
             }
         }, { passive: false });
 
         document.addEventListener('touchend', () => {
+            if (!isPulling) return;
+            
             if (pullDistance >= threshold) {
                 // Add animation class
                 document.body.classList.add('refreshing');
@@ -51,6 +68,10 @@ class TaskManager {
                 // Just animate back if threshold not met
                 document.body.style.transform = '';
             }
+            
+            // Reset states
+            isPulling = false;
+            this.headerArea.removeAttribute('data-pull-state');
         });
     }
 
