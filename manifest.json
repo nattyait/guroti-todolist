@@ -2,7 +2,7 @@
     "name": "Kanom Jeen Order List",
     "short_name": "Order List",
     "description": "A simple order list for Kanom Jeen",
-    "start_url": "/",
+    "start_url": "/guroti-todolist/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#6200ea",
