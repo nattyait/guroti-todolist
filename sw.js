@@ -1,25 +1,19 @@
 const CACHE_NAME = 'kanom-jeen-order-v1';
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/styles.css',
-    '/script.js',
-    '/tasks.json',
-    '/manifest.json',
-    '/icons/icon-72x72.png',
-    '/icons/icon-96x96.png',
-    '/icons/icon-128x128.png',
-    '/icons/icon-144x144.png',
-    '/icons/icon-152x152.png',
-    '/icons/icon-192x192.png',
-    '/icons/icon-384x384.png',
-    '/icons/icon-512x512.png',
-    '/splash/apple-splash-2048-2732.png',
-    '/splash/apple-splash-1668-2388.png',
-    '/splash/apple-splash-1536-2048.png',
-    '/splash/apple-splash-1242-2688.png',
-    '/splash/apple-splash-1125-2436.png',
-    '/splash/apple-splash-828-1792.png'
+    './',
+    './index.html',
+    './styles.css',
+    './script.js',
+    './tasks.json',
+    './manifest.json',
+    './icons/icon-72x72.png',
+    './icons/icon-96x96.png',
+    './icons/icon-128x128.png',
+    './icons/icon-144x144.png',
+    './icons/icon-152x152.png',
+    './icons/icon-192x192.png',
+    './icons/icon-384x384.png',
+    './icons/icon-512x512.png'
 ];
 
 // Install event - cache assets
