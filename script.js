@@ -17,34 +17,49 @@ class TaskManager {
             const data = await response.json();
             const amount = parseInt(localStorage.getItem('premiumAmount')) || 0;
             
-            // Get current tasks and their completion states
+            // Get current tasks, their completion states, and removed states
             const currentTasks = this.getTasks();
-            const completionStates = {};
-            currentTasks.forEach(task => {
-                // Use the task text without HTML tags as key
-                const plainText = task.text.replace(/<[^>]*>/g, '');
-                completionStates[plainText] = task.completed;
-            });
+            const taskStates = {};
+            const removedTasks = JSON.parse(localStorage.getItem('removedTasks') || '[]');
             
-            // Replace placeholders with actual amount, handling multiplication
-            const processedTasks = data.tasks.map(task => {
-                let text = task.text;
-                // Handle {{amount*2}} format
-                text = text.replace(/{{amount\*(\d+)}}/, (match, multiplier) => {
-                    const calculatedAmount = amount * parseInt(multiplier);
-                    return `<span class="amount">${calculatedAmount}</span>`;
-                });
-                // Handle {{amount}} format
-                text = text.replace(/{{amount}}/, `<span class="amount">${amount}</span>`);
-                
-                // Get the plain text version for checking completion state
-                const plainText = text.replace(/<[^>]*>/g, '');
-                
-                return {
-                    text: text,
-                    completed: completionStates[plainText] || false
+            currentTasks.forEach(task => {
+                const plainText = task.text.replace(/<[^>]*>/g, '');
+                taskStates[plainText] = {
+                    completed: task.completed,
+                    removed: false
                 };
             });
+
+            // Mark removed tasks
+            removedTasks.forEach(plainText => {
+                taskStates[plainText] = {
+                    completed: false,
+                    removed: true
+                };
+            });
+            
+            // Process tasks, respecting their states
+            const processedTasks = data.tasks
+                .map(task => {
+                    let text = task.text;
+                    // Handle {{amount*2}} format
+                    text = text.replace(/{{amount\*(\d+)}}/, (match, multiplier) => {
+                        const calculatedAmount = amount * parseInt(multiplier);
+                        return `<span class="amount">${calculatedAmount}</span>`;
+                    });
+                    // Handle {{amount}} format
+                    text = text.replace(/{{amount}}/, `<span class="amount">${amount}</span>`);
+                    
+                    const plainText = text.replace(/<[^>]*>/g, '');
+                    const state = taskStates[plainText] || { completed: false, removed: false };
+                    
+                    return {
+                        text: text,
+                        completed: state.completed,
+                        removed: state.removed
+                    };
+                })
+                .filter(task => !task.removed); // Filter out removed tasks
             
             localStorage.setItem('tasks', JSON.stringify(processedTasks));
             
@@ -131,6 +146,11 @@ class TaskManager {
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
         removeButton.onclick = () => {
+            const plainText = task.text.replace(/<[^>]*>/g, '');
+            const removedTasks = JSON.parse(localStorage.getItem('removedTasks') || '[]');
+            removedTasks.push(plainText);
+            localStorage.setItem('removedTasks', JSON.stringify(removedTasks));
+            
             const tasks = this.getTasks().filter(t => t.text !== task.text);
             localStorage.setItem('tasks', JSON.stringify(tasks));
             li.remove();
@@ -268,13 +288,18 @@ class TaskManager {
 
     deleteAllTasks() {
         if (confirm('Are you sure you want to delete all tasks?')) {
-            // Clear localStorage
             localStorage.removeItem('tasks');
-            
-            // Clear the UI
+            localStorage.removeItem('removedTasks'); // Clear removed tasks state
             this.taskList.innerHTML = '';
-            
-            // Reload initial tasks
+            this.loadInitialTasks();
+        }
+    }
+
+    resetTasks() {
+        if (confirm('Are you sure you want to reset all tasks to their initial state?')) {
+            localStorage.removeItem('tasks');
+            localStorage.removeItem('removedTasks');
+            this.taskList.innerHTML = '';
             this.loadInitialTasks();
         }
     }

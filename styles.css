@@ -101,4 +101,12 @@ span {
     padding: 2px 6px;
     border-radius: 4px;
     margin: 0 2px;
+}
+
+.reset-btn {
+    background-color: #dc3545;
+}
+
+.reset-btn:hover {
+    background-color: #c82333;
 } 
