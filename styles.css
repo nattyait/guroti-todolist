@@ -92,4 +92,13 @@ span {
 .completed {
     text-decoration: line-through;
     color: #888;
+}
+
+.amount {
+    font-weight: bold;
+    color: #6200ea;
+    background-color: #f3e5f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin: 0 2px;
 } 

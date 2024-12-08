@@ -22,10 +22,11 @@ class TaskManager {
                 let text = task.text;
                 // Handle {{amount*2}} format
                 text = text.replace(/{{amount\*(\d+)}}/, (match, multiplier) => {
-                    return amount * parseInt(multiplier);
+                    const calculatedAmount = amount * parseInt(multiplier);
+                    return `<span class="amount">${calculatedAmount}</span>`;
                 });
                 // Handle {{amount}} format
-                text = text.replace(/{{amount}}/, amount);
+                text = text.replace(/{{amount}}/, `<span class="amount">${amount}</span>`);
                 
                 return {
                     text: text,
@@ -88,17 +89,18 @@ class TaskManager {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = task.completed;
+        
+        // Create task text span
+        const taskSpan = document.createElement('span');
+        taskSpan.innerHTML = task.text;
+        if (task.completed) {
+            taskSpan.classList.add('completed');
+        }
+        
         checkbox.addEventListener('change', () => {
             taskSpan.classList.toggle('completed');
             this.updateTaskStatus(task.text, checkbox.checked);
         });
-        
-        // Create task text span
-        const taskSpan = document.createElement('span');
-        taskSpan.textContent = task.text;
-        if (task.completed) {
-            taskSpan.classList.add('completed');
-        }
         
         // Create edit button
         const editButton = document.createElement('button');

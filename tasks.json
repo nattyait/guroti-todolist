@@ -5,6 +5,14 @@
             "completed": false
         },
         {
+            "text": "กระดาษปูกล่อง {{amount}} แผ่น",
+            "completed": false
+        },
+        {
+            "text": "สติ๊กเกอร์ติดกล่องพรีเมี่ยม {{amount}} ชุด",
+            "completed": false
+        },
+        {
             "text": "ไข่ต้ม {{amount}} ฟอง",
             "completed": false
         },
@@ -29,7 +37,7 @@
             "completed": false
         },
         {
-            "text": "สติ๊กเกอร์ติดกล่องพรีเมี่ยม {{amount}} ชุด",
+            "text": "ขวดแอปเปิ้ลใส่น้ำ {{amount}} ขวด",
             "completed": false
         },
         {
