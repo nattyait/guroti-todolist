@@ -1,0 +1,20 @@
+{
+    "tasks": [
+        {
+            "text": "Buy groceries",
+            "completed": false
+        },
+        {
+            "text": "Read a book",
+            "completed": false
+        },
+        {
+            "text": "Exercise",
+            "completed": false
+        },
+        {
+            "text": "Call family",
+            "completed": false
+        }
+    ]
+} 

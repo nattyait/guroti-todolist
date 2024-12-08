@@ -2,7 +2,26 @@ class TaskManager {
     constructor(taskListId = 'taskList', taskInputId = 'taskInput') {
         this.taskList = document.getElementById(taskListId);
         this.taskInput = document.getElementById(taskInputId);
-        this.loadTasks();
+        this.loadInitialTasks();
+    }
+
+    async loadInitialTasks() {
+        const tasks = this.getTasks();
+        if (tasks.length === 0) {
+            try {
+                const response = await fetch('tasks.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                localStorage.setItem('tasks', JSON.stringify(data.tasks));
+                this.loadTasks();
+            } catch (error) {
+                this.loadTasks();
+            }
+        } else {
+            this.loadTasks();
+        }
     }
 
     addTask() {
@@ -102,17 +121,35 @@ class TaskManager {
 
     getDragAfterElement(y) {
         const draggableElements = [...this.taskList.querySelectorAll('li:not(.dragging)')];
-        
         return draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = y - box.top - box.height / 2;
-            
             if (offset < 0 && offset > closest.offset) {
                 return { offset: offset, element: child };
             } else {
                 return closest;
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    getTasks() {
+        const tasksJson = localStorage.getItem('tasks');
+        return tasksJson ? JSON.parse(tasksJson) : [];
+    }
+
+    saveTask(task) {
+        const tasks = this.getTasks();
+        tasks.push(task);
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    updateTaskStatus(taskText, completed) {
+        const tasks = this.getTasks();
+        const task = tasks.find(t => t.text === taskText);
+        if (task) {
+            task.completed = completed;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
     }
 
     updateTasksOrder() {
@@ -128,25 +165,6 @@ class TaskManager {
             }
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-
-    saveTask(task) {
-        const tasks = this.getTasks();
-        tasks.push(task);
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-
-    getTasks() {
-        return JSON.parse(localStorage.getItem('tasks')) || [];
-    }
-
-    updateTaskStatus(taskText, completed) {
-        const tasks = this.getTasks();
-        const task = tasks.find(t => t.text === taskText);
-        if (task) {
-            task.completed = completed;
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
     }
 
     editTask(taskSpan) {
@@ -183,7 +201,6 @@ class TaskManager {
     }
 }
 
-// Initialize TaskManager when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.taskManager = new TaskManager();
 });
