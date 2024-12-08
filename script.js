@@ -180,16 +180,45 @@ class TaskManager {
         this.taskList.querySelectorAll('li').forEach(item => {
             if (!item.draggable) {
                 item.draggable = true;
+
+                // Mouse events
                 item.addEventListener('dragstart', () => {
                     item.classList.add('dragging');
                 });
+
                 item.addEventListener('dragend', () => {
                     item.classList.remove('dragging');
+                    this.updateTasksOrder();
+                });
+
+                // Touch events
+                item.addEventListener('touchstart', (e) => {
+                    item.classList.add('dragging');
+                    this.touchStartY = e.touches[0].clientY;
+                    this.draggedItem = item;
+                }, { passive: true });
+
+                item.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const afterElement = this.getDragAfterElement(touch.clientY);
+                    
+                    if (afterElement) {
+                        this.taskList.insertBefore(this.draggedItem, afterElement);
+                    } else {
+                        this.taskList.appendChild(this.draggedItem);
+                    }
+                });
+
+                item.addEventListener('touchend', () => {
+                    item.classList.remove('dragging');
+                    this.draggedItem = null;
                     this.updateTasksOrder();
                 });
             }
         });
 
+        // Mouse drag over
         this.taskList.addEventListener('dragover', e => {
             e.preventDefault();
             const afterElement = this.getDragAfterElement(e.clientY);
@@ -206,9 +235,11 @@ class TaskManager {
 
     getDragAfterElement(y) {
         const draggableElements = [...this.taskList.querySelectorAll('li:not(.dragging)')];
+        
         return draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
             const offset = y - box.top - box.height / 2;
+            
             if (offset < 0 && offset > closest.offset) {
                 return { offset: offset, element: child };
             } else {
