@@ -1,19 +1,47 @@
 {
     "tasks": [
         {
-            "text": "Buy groceries",
+            "text": "กล่องพรีเมี่ยม",
             "completed": false
         },
         {
-            "text": "Read a book",
+            "text": "ไข่ต้ม",
             "completed": false
         },
         {
-            "text": "Exercise",
+            "text": "ผักสด",
             "completed": false
         },
         {
-            "text": "Call family",
+            "text": "กล่องสี่เหลี่ยมใส่ผัก ใส่ขนมจีน",
+            "completed": false
+        },
+        {
+            "text": "กล่องกลมใส่น้ำยาปู ใส่โรตีกรอบม้วน",
+            "completed": false
+        },
+        {
+            "text": "ถ้วย 1 ออนซ์ ใส่นม",
+            "completed": false
+        },
+        {
+            "text": "แป้งโรตีสำหรับ โรตีกรอบม้วน",
+            "completed": false
+        },
+        {
+            "text": "สติ๊กเกอร์ติดกล่องพรีเมี่ยม",
+            "completed": false
+        },
+        {
+            "text": "ชุดช้อน",
+            "completed": false
+        },
+        {
+            "text": "น้ำปลาพริก${cwd}",
+            "completed": false
+        },
+        {
+            "text": "ถุงใส่กล่องข้าวทั้งหมดเพื่อส่งลูกค้า",
             "completed": false
         }
     ]
