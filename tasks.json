@@ -1,0 +1,56 @@
+{
+    "tasks": [
+        {
+            "text": "กล่องพรีเมี่ยม {{amount}} กล่อง",
+            "completed": false
+        },
+        {
+            "text": "กระดาษปูกล่อง {{amount}} แผ่น",
+            "completed": false
+        },
+        {
+            "text": "สติ๊กเกอร์ติดกล่องพรีเมี่ยม {{amount}} ชุด",
+            "completed": false
+        },
+        {
+            "text": "ไข่ต้ม {{amount}} ฟอง",
+            "completed": false
+        },
+        {
+            "text": "ผักสด {{amount}} ชุด",
+            "completed": false
+        },
+        {
+            "text": "กล่องสี่เหลี่ยมใส่ผัก ใส่ขนมจีน {{amount*2}} กล่อง",
+            "completed": false
+        },
+        {
+            "text": "กล่องกลมใส่น้ำยาปู ใส่โรตีกรอบม้วน {{amount*2}} กล่อง",
+            "completed": false
+        },
+        {
+            "text": "ถ้วย 1 ออนซ์ ใส่นม {{amount}} ถ้วย",
+            "completed": false
+        },
+        {
+            "text": "แป้งโรตีสำหรับ โรตีกรอบม้วน {{amount}} ก้อน",
+            "completed": false
+        },
+        {
+            "text": "ขวดแอปเปิ้ลใส่น้ำ {{amount}} ขวด",
+            "completed": false
+        },
+        {
+            "text": "ชุดช้อน {{amount}} ชุด",
+            "completed": false
+        },
+        {
+            "text": "น้ำปลาพริก {{amount}} ชุด",
+            "completed": false
+        },
+        {
+            "text": "ถุงใส่กล่องข้าวทั้งหมดเพื่อส่งลูกค้า",
+            "completed": false
+        }
+    ]
+} 
