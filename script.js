@@ -9,6 +9,49 @@ class TaskManager {
         this.touchStartTime = 0;
         this.loadPremiumAmount();
         this.loadInitialTasks();
+        this.setupPullToRefresh();
+    }
+
+    setupPullToRefresh() {
+        let startY = 0;
+        let pullDistance = 0;
+        const threshold = 150; // Distance needed to trigger refresh
+
+        document.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+            pullDistance = 0;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            // Only allow pull-to-refresh when at top of page
+            if (window.scrollY === 0) {
+                const y = e.touches[0].clientY;
+                pullDistance = y - startY;
+                
+                if (pullDistance > 0) {
+                    e.preventDefault();
+                    document.body.style.transform = `translateY(${Math.min(pullDistance/2, threshold)}px)`;
+                }
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            if (pullDistance >= threshold) {
+                // Add animation class
+                document.body.classList.add('refreshing');
+                
+                // Animate back to position
+                document.body.style.transform = '';
+                
+                // Reload page after animation
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300);
+            } else {
+                // Just animate back if threshold not met
+                document.body.style.transform = '';
+            }
+        });
     }
 
     async loadInitialTasks() {

@@ -126,4 +126,39 @@ span {
 
 .reset-btn:hover {
     background-color: #c82333;
+}
+
+body {
+    transition: transform 0.3s ease-out;
+}
+
+.refreshing {
+    animation: bounce 0.3s ease-in-out;
+}
+
+@keyframes bounce {
+    0% {
+        transform: translateY(75px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* Add a visual indicator at the top of the page */
+body::before {
+    content: '↻ Pull to refresh';
+    display: block;
+    position: fixed;
+    top: -40px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    z-index: 1000;
+}
+
+body[style*="transform"] ::before {
+    content: '↻ Release to refresh';
 } 
