@@ -166,4 +166,29 @@ body[style*="transform"] ::before {
 .header-area[data-pull-state="pull"]::before,
 .header-area[data-pull-state="release"]::before {
     display: none;
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #6200ea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes spin {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    100% { transform: translateX(-50%) rotate(360deg); }
+}
+
+.loading .loading-spinner {
+    display: block;
 } 

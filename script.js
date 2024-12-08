@@ -39,13 +39,6 @@ class TaskManager {
             if (pullDistance > 0 && window.scrollY === 0) {
                 e.preventDefault();
                 document.body.style.transform = `translateY(${Math.min(pullDistance/2, threshold)}px)`;
-                
-                // Update pull indicator text
-                if (pullDistance >= threshold) {
-                    this.headerArea.setAttribute('data-pull-state', 'release');
-                } else {
-                    this.headerArea.setAttribute('data-pull-state', 'pull');
-                }
             }
         }, { passive: false });
 
@@ -55,10 +48,11 @@ class TaskManager {
             if (pullDistance >= threshold) {
                 document.body.classList.add('refreshing');
                 document.body.style.transform = '';
+                document.body.classList.add('loading');
                 
                 setTimeout(() => {
                     window.location.reload();
-                }, 300);
+                }, 800);
             } else {
                 document.body.style.transform = '';
             }
