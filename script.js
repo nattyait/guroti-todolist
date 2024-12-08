@@ -4,6 +4,9 @@ class TaskManager {
         this.taskInput = document.getElementById(taskInputId);
         this.premiumInput = document.getElementById(premiumAmountId);
         this.titleElement = document.querySelector('h1');
+        this.draggedItem = null;
+        this.touchStartY = 0;
+        this.touchStartTime = 0;
         this.loadPremiumAmount();
         this.loadInitialTasks();
     }
@@ -178,58 +181,77 @@ class TaskManager {
 
     setupDragAndDrop() {
         this.taskList.querySelectorAll('li').forEach(item => {
-            if (!item.draggable) {
-                item.draggable = true;
+            // Touch event handlers
+            item.addEventListener('touchstart', (e) => {
+                this.touchStartY = e.touches[0].clientY;
+                this.touchStartTime = Date.now();
+                this.draggedItem = item;
+                
+                // Add visual feedback after a short delay
+                setTimeout(() => {
+                    if (this.draggedItem === item) {
+                        item.classList.add('dragging');
+                    }
+                }, 200);
+            }, { passive: false });
 
-                // Mouse events
-                item.addEventListener('dragstart', () => {
-                    item.classList.add('dragging');
-                });
-
-                item.addEventListener('dragend', () => {
-                    item.classList.remove('dragging');
-                    this.updateTasksOrder();
-                });
-
-                // Touch events
-                item.addEventListener('touchstart', (e) => {
-                    item.classList.add('dragging');
-                    this.touchStartY = e.touches[0].clientY;
-                    this.draggedItem = item;
-                }, { passive: true });
-
-                item.addEventListener('touchmove', (e) => {
-                    e.preventDefault();
-                    const touch = e.touches[0];
-                    const afterElement = this.getDragAfterElement(touch.clientY);
+            item.addEventListener('touchmove', (e) => {
+                if (!this.draggedItem) return;
+                
+                e.preventDefault();
+                const touch = e.touches[0];
+                const currentY = touch.clientY;
+                const deltaY = currentY - this.touchStartY;
+                
+                // Apply transform to move the item
+                this.draggedItem.style.transform = `translateY(${deltaY}px)`;
+                
+                // Find and move items
+                const rect = this.draggedItem.getBoundingClientRect();
+                const siblings = [...this.taskList.children];
+                const draggedIndex = siblings.indexOf(this.draggedItem);
+                
+                siblings.forEach((sibling, index) => {
+                    if (sibling === this.draggedItem) return;
                     
-                    if (afterElement) {
-                        this.taskList.insertBefore(this.draggedItem, afterElement);
-                    } else {
-                        this.taskList.appendChild(this.draggedItem);
+                    const siblingRect = sibling.getBoundingClientRect();
+                    const siblingMiddle = siblingRect.top + siblingRect.height / 2;
+                    
+                    if (rect.top + rect.height / 2 < siblingMiddle && index < draggedIndex) {
+                        sibling.style.transform = 'translateY(40px)';
+                        setTimeout(() => {
+                            sibling.style.transform = '';
+                            this.taskList.insertBefore(this.draggedItem, sibling);
+                        }, 100);
+                    } else if (rect.top + rect.height / 2 > siblingMiddle && index > draggedIndex) {
+                        sibling.style.transform = 'translateY(-40px)';
+                        setTimeout(() => {
+                            sibling.style.transform = '';
+                            this.taskList.insertBefore(sibling, this.draggedItem);
+                        }, 100);
                     }
                 });
+            }, { passive: false });
 
-                item.addEventListener('touchend', () => {
-                    item.classList.remove('dragging');
-                    this.draggedItem = null;
-                    this.updateTasksOrder();
-                });
-            }
-        });
+            item.addEventListener('touchend', () => {
+                if (!this.draggedItem) return;
+                
+                this.draggedItem.classList.remove('dragging');
+                this.draggedItem.style.transform = '';
+                
+                // Update order in storage
+                this.updateTasksOrder();
+                
+                // Reset variables
+                this.draggedItem = null;
+                this.touchStartY = 0;
+                this.touchStartTime = 0;
+            });
 
-        // Mouse drag over
-        this.taskList.addEventListener('dragover', e => {
-            e.preventDefault();
-            const afterElement = this.getDragAfterElement(e.clientY);
-            const draggable = document.querySelector('.dragging');
-            if (draggable) {
-                if (afterElement) {
-                    this.taskList.insertBefore(draggable, afterElement);
-                } else {
-                    this.taskList.appendChild(draggable);
-                }
-            }
+            // Prevent default drag behavior on iOS
+            item.addEventListener('dragstart', (e) => {
+                e.preventDefault();
+            });
         });
     }
 

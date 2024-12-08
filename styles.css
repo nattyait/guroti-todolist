@@ -77,17 +77,23 @@ li {
     border-radius: 4px;
     margin: 5px 0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    cursor: move;
     touch-action: none;
-    -webkit-user-select: none;
     user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    transition: transform 0.2s ease;
 }
 
 li.dragging {
-    opacity: 0.5;
+    opacity: 0.8;
     background: #f5f5f5;
-    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     z-index: 1000;
+}
+
+.taskList {
+    position: relative;
+    min-height: 100px;
 }
 
 input[type="checkbox"] {
