@@ -170,25 +170,10 @@ body[style*="transform"] ::before {
 }
 
 .header-area::before {
-    content: '↻ Pull to refresh';
-    display: block;
-    position: absolute;
-    top: -30px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: #666;
-    font-size: 14px;
-    opacity: 0;
-    transition: opacity 0.2s;
+    display: none;
 }
 
-.header-area[data-pull-state="pull"]::before {
-    content: '↻ Pull to refresh';
-    opacity: 1;
-}
-
+.header-area[data-pull-state="pull"]::before,
 .header-area[data-pull-state="release"]::before {
-    content: '↻ Release to refresh';
-    opacity: 1;
+    display: none;
 } 

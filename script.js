@@ -20,7 +20,6 @@ class TaskManager {
         let isPulling = false;
 
         this.headerArea.addEventListener('touchstart', (e) => {
-            // Only start if touch is in header area
             const touch = e.touches[0];
             const headerRect = this.headerArea.getBoundingClientRect();
             
@@ -54,24 +53,17 @@ class TaskManager {
             if (!isPulling) return;
             
             if (pullDistance >= threshold) {
-                // Add animation class
                 document.body.classList.add('refreshing');
-                
-                // Animate back to position
                 document.body.style.transform = '';
                 
-                // Reload page after animation
                 setTimeout(() => {
                     window.location.reload();
                 }, 300);
             } else {
-                // Just animate back if threshold not met
                 document.body.style.transform = '';
             }
             
-            // Reset states
             isPulling = false;
-            this.headerArea.removeAttribute('data-pull-state');
         });
     }
 
