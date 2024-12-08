@@ -5,11 +5,11 @@
             "completed": false
         },
         {
-            "text": "ไข่ต้ม",
+            "text": "ไข่ต้ม {{amount}} ฟอง",
             "completed": false
         },
         {
-            "text": "ผักสด",
+            "text": "ผักสด {{amount}} ชุด",
             "completed": false
         },
         {
@@ -17,27 +17,27 @@
             "completed": false
         },
         {
-            "text": "กล่องกลมใส่น้ำยาปู ใส่โรตีกรอบม้วน",
+            "text": "กล่องกลมใส่น้ำยาปู ใส่โรตีกรอบม้วน {{amount*2}} กล่อง",
             "completed": false
         },
         {
-            "text": "ถ้วย 1 ออนซ์ ใส่นม",
+            "text": "ถ้วย 1 ออนซ์ ใส่นม {{amount}} ถ้วย",
             "completed": false
         },
         {
-            "text": "แป้งโรตีสำหรับ โรตีกรอบม้วน",
+            "text": "แป้งโรตีสำหรับ โรตีกรอบม้วน {{amount}} ก้อน",
             "completed": false
         },
         {
-            "text": "สติ๊กเกอร์ติดกล่องพรีเมี่ยม",
+            "text": "สติ๊กเกอร์ติดกล่องพรีเมี่ยม {{amount}} ชุด",
             "completed": false
         },
         {
-            "text": "ชุดช้อน",
+            "text": "ชุดช้อน {{amount}} ชุด",
             "completed": false
         },
         {
-            "text": "น้ำปลาพริก",
+            "text": "น้ำปลาพริก {{amount}} ชุด",
             "completed": false
         },
         {

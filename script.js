@@ -4,36 +4,41 @@ class TaskManager {
         this.taskInput = document.getElementById(taskInputId);
         this.premiumInput = document.getElementById(premiumAmountId);
         this.titleElement = document.querySelector('h1');
-        this.loadInitialTasks();
         this.loadPremiumAmount();
+        this.loadInitialTasks();
     }
 
     async loadInitialTasks() {
-        const tasks = this.getTasks();
-        if (tasks.length === 0) {
-            try {
-                const response = await fetch('tasks.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                const amount = localStorage.getItem('premiumAmount') || '0';
-                
-                // Replace placeholders with actual amount, considering multipliers
-                const processedTasks = data.tasks.map(task => {
-                    const calculatedAmount = task.multiplier ? amount * task.multiplier : amount;
-                    return {
-                        text: task.text.replace(/{{amount\*?\d*}}/, calculatedAmount),
-                        completed: task.completed
-                    };
-                });
-                
-                localStorage.setItem('tasks', JSON.stringify(processedTasks));
-                this.loadTasks();
-            } catch (error) {
-                this.loadTasks();
+        try {
+            const response = await fetch('tasks.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        } else {
+            const data = await response.json();
+            const amount = parseInt(localStorage.getItem('premiumAmount')) || 0;
+            
+            // Replace placeholders with actual amount, handling multiplication
+            const processedTasks = data.tasks.map(task => {
+                let text = task.text;
+                // Handle {{amount*2}} format
+                text = text.replace(/{{amount\*(\d+)}}/, (match, multiplier) => {
+                    return amount * parseInt(multiplier);
+                });
+                // Handle {{amount}} format
+                text = text.replace(/{{amount}}/, amount);
+                
+                return {
+                    text: text,
+                    completed: task.completed
+                };
+            });
+            
+            localStorage.setItem('tasks', JSON.stringify(processedTasks));
+            
+            // Clear existing tasks and load new ones
+            this.taskList.innerHTML = '';
+            this.loadTasks();
+        } catch (error) {
             this.loadTasks();
         }
     }
@@ -45,8 +50,7 @@ class TaskManager {
             this.premiumInput.value = amount;
             this.updateTitle(amount);
             
-            // Reload initial tasks with new amount
-            localStorage.removeItem('tasks');
+            // Reload tasks with new amount
             this.loadInitialTasks();
         }
     }
@@ -236,6 +240,7 @@ class TaskManager {
 
     loadTasks() {
         const tasks = this.getTasks();
+        this.taskList.innerHTML = ''; // Clear existing tasks
         tasks.forEach(task => this.createTask(task));
     }
 
