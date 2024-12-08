@@ -1,8 +1,32 @@
 class TaskManager {
-    constructor(taskListId = 'taskList', taskInputId = 'taskInput') {
+    constructor(taskListId = 'taskList', taskInputId = 'taskInput', premiumAmountId = 'premiumAmount') {
         this.taskList = document.getElementById(taskListId);
         this.taskInput = document.getElementById(taskInputId);
+        this.premiumInput = document.getElementById(premiumAmountId);
+        this.titleElement = document.querySelector('h1');
         this.loadInitialTasks();
+        this.loadPremiumAmount();
+    }
+
+    setPremiumAmount() {
+        const amount = this.premiumInput.value;
+        if (amount && !isNaN(amount) && amount >= 0) {
+            localStorage.setItem('premiumAmount', amount);
+            this.premiumInput.value = amount;
+            this.updateTitle(amount);
+        }
+    }
+
+    loadPremiumAmount() {
+        const amount = localStorage.getItem('premiumAmount');
+        if (amount) {
+            this.premiumInput.value = amount;
+            this.updateTitle(amount);
+        }
+    }
+
+    updateTitle(amount) {
+        this.titleElement.textContent = `To-Do List for เซ็ตขนมจีน (Premium: ${amount} boxes)`;
     }
 
     async loadInitialTasks() {
