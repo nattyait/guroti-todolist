@@ -93,4 +93,12 @@ button:hover {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+.delete-all {
+    background-color: #dc3545;
+}
+
+.delete-all:hover {
+    background-color: #c82333;
 } 

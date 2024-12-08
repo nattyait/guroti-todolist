@@ -8,27 +8,6 @@ class TaskManager {
         this.loadPremiumAmount();
     }
 
-    setPremiumAmount() {
-        const amount = this.premiumInput.value;
-        if (amount && !isNaN(amount) && amount >= 0) {
-            localStorage.setItem('premiumAmount', amount);
-            this.premiumInput.value = amount;
-            this.updateTitle(amount);
-        }
-    }
-
-    loadPremiumAmount() {
-        const amount = localStorage.getItem('premiumAmount');
-        if (amount) {
-            this.premiumInput.value = amount;
-            this.updateTitle(amount);
-        }
-    }
-
-    updateTitle(amount) {
-        this.titleElement.textContent = `To-Do List for เซ็ตขนมจีน (Premium: ${amount} boxes)`;
-    }
-
     async loadInitialTasks() {
         const tasks = this.getTasks();
         if (tasks.length === 0) {
@@ -38,13 +17,49 @@ class TaskManager {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                localStorage.setItem('tasks', JSON.stringify(data.tasks));
+                const amount = localStorage.getItem('premiumAmount') || '0';
+                
+                // Replace placeholders with actual amount, considering multipliers
+                const processedTasks = data.tasks.map(task => {
+                    const calculatedAmount = task.multiplier ? amount * task.multiplier : amount;
+                    return {
+                        text: task.text.replace(/{{amount\*?\d*}}/, calculatedAmount),
+                        completed: task.completed
+                    };
+                });
+                
+                localStorage.setItem('tasks', JSON.stringify(processedTasks));
                 this.loadTasks();
             } catch (error) {
                 this.loadTasks();
             }
         } else {
             this.loadTasks();
+        }
+    }
+
+    setPremiumAmount() {
+        const amount = this.premiumInput.value;
+        if (amount && !isNaN(amount) && amount >= 0) {
+            localStorage.setItem('premiumAmount', amount);
+            this.premiumInput.value = amount;
+            this.updateTitle(amount);
+            
+            // Reload initial tasks with new amount
+            localStorage.removeItem('tasks');
+            this.loadInitialTasks();
+        }
+    }
+
+    updateTitle(amount) {
+        this.titleElement.textContent = `To-Do List เซ็ตขนมจีน (Premium: ${amount} กล่อง)`;
+    }
+
+    loadPremiumAmount() {
+        const amount = localStorage.getItem('premiumAmount');
+        if (amount) {
+            this.premiumInput.value = amount;
+            this.updateTitle(amount);
         }
     }
 
@@ -222,6 +237,19 @@ class TaskManager {
     loadTasks() {
         const tasks = this.getTasks();
         tasks.forEach(task => this.createTask(task));
+    }
+
+    deleteAllTasks() {
+        if (confirm('Are you sure you want to delete all tasks?')) {
+            // Clear localStorage
+            localStorage.removeItem('tasks');
+            
+            // Clear the UI
+            this.taskList.innerHTML = '';
+            
+            // Reload initial tasks
+            this.loadInitialTasks();
+        }
     }
 }
 
