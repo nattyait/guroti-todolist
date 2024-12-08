@@ -17,6 +17,15 @@ class TaskManager {
             const data = await response.json();
             const amount = parseInt(localStorage.getItem('premiumAmount')) || 0;
             
+            // Get current tasks and their completion states
+            const currentTasks = this.getTasks();
+            const completionStates = {};
+            currentTasks.forEach(task => {
+                // Use the task text without HTML tags as key
+                const plainText = task.text.replace(/<[^>]*>/g, '');
+                completionStates[plainText] = task.completed;
+            });
+            
             // Replace placeholders with actual amount, handling multiplication
             const processedTasks = data.tasks.map(task => {
                 let text = task.text;
@@ -28,9 +37,12 @@ class TaskManager {
                 // Handle {{amount}} format
                 text = text.replace(/{{amount}}/, `<span class="amount">${amount}</span>`);
                 
+                // Get the plain text version for checking completion state
+                const plainText = text.replace(/<[^>]*>/g, '');
+                
                 return {
                     text: text,
-                    completed: task.completed
+                    completed: completionStates[plainText] || false
                 };
             });
             
@@ -50,6 +62,14 @@ class TaskManager {
             localStorage.setItem('premiumAmount', amount);
             this.premiumInput.value = amount;
             this.updateTitle(amount);
+            
+            // Save current completion states before reloading
+            const currentTasks = this.getTasks();
+            const completionStates = {};
+            currentTasks.forEach(task => {
+                const plainText = task.text.replace(/<[^>]*>/g, '');
+                completionStates[plainText] = task.completed;
+            });
             
             // Reload tasks with new amount
             this.loadInitialTasks();
@@ -204,7 +224,7 @@ class TaskManager {
             const checkbox = li.querySelector('input[type="checkbox"]');
             if (span) {
                 tasks.push({
-                    text: span.textContent,
+                    text: span.innerHTML, // Changed from textContent to innerHTML
                     completed: checkbox.checked
                 });
             }
